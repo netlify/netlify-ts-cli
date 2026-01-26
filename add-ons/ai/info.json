@@ -1,0 +1,27 @@
+{
+  "name": "AI Chat",
+  "phase": "add-on",
+  "description": "Add AI chat capabilities with multi-vendor support (OpenAI, Anthropic, Gemini, Ollama). Includes a chat page and pop-up assistant.",
+  "link": "https://tanstack.com/ai",
+  "modes": ["file-router"],
+  "type": "add-on",
+  "priority": 20,
+  "routes": [
+    {
+      "icon": "MessagesSquare",
+      "url": "/chat",
+      "name": "Chat",
+      "path": "src/routes/chat.tsx",
+      "jsName": "ChatPage"
+    }
+  ],
+  "integrations": [
+    {
+      "type": "header-user",
+      "path": "src/components/AIAssistant.tsx",
+      "jsName": "AIAssistant"
+    }
+  ],
+  "dependsOn": [],
+  "variables": []
+}

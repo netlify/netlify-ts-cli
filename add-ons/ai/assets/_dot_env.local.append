@@ -1,0 +1,13 @@
+# AI Provider API Keys (add the ones you want to use)
+# At least one key is required for AI chat to work
+
+# Anthropic (Claude)
+ANTHROPIC_API_KEY=
+
+# OpenAI (GPT-4o)
+OPENAI_API_KEY=
+
+# Google Gemini
+GEMINI_API_KEY=
+
+# Note: Ollama is available locally without an API key

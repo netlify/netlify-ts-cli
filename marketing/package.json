@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "@tanstack/ai": "latest",
+    "@tanstack/ai-anthropic": "latest",
+    "@tanstack/ai-client": "latest",
+    "@tanstack/ai-react": "latest",
+    "@tanstack/react-ai-devtools": "latest",
+    "@tanstack/react-store": "^0.7.0",
+    "@tanstack/store": "^0.7.0",
+    "highlight.js": "^11.11.1",
+    "streamdown": "^1.6.5",
+    "zod": "^3.25.0"
+  }
+}

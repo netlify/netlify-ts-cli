@@ -1,0 +1,35 @@
+{
+  "name": "Blog",
+  "description": "A Hawaii adventures travel blog built with content-collections and TanStack Start for Netlify.",
+  "phase": "example",
+  "modes": ["file-router"],
+  "type": "example",
+  "priority": 10,
+  "link": "",
+  "routes": [
+    {
+      "url": "/",
+      "path": "src/routes/index.tsx",
+      "jsName": "BlogHome"
+    },
+    {
+      "url": "/posts/$slug",
+      "path": "src/routes/posts.$slug.tsx",
+      "jsName": "BlogPost"
+    },
+    {
+      "url": "/category/$category",
+      "path": "src/routes/category.$category.tsx",
+      "jsName": "BlogCategory"
+    }
+  ],
+  "integrations": [
+    {
+      "type": "vite-plugin",
+      "import": "import contentCollections from '@content-collections/vite'",
+      "code": "contentCollections()"
+    }
+  ],
+  "dependsOn": [],
+  "variables": []
+}
