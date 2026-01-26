@@ -1,0 +1,34 @@
+{
+  "name": "netlify-cta",
+  "version": "0.44.1",
+  "description": "Create TanStack Start applications for Netlify",
+  "bin": "./dist/index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/TanStack/create-router-app.git"
+  },
+  "homepage": "https://tanstack.com/start",
+  "keywords": [
+    "netlify",
+    "tanstack",
+    "tanstack-start",
+    "create-app"
+  ],
+  "author": "Jack Herrington <jherr@pobox.com>",
+  "license": "MIT",
+  "packageManager": "pnpm@9.15.5",
+  "dependencies": {
+    "@tanstack/cta-cli": "^0.48.0",
+    "@tanstack/cta-engine": "^0.48.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.4",
+    "typescript": "^5.6.3"
+  }
+}

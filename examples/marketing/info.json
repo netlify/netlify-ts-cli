@@ -1,0 +1,30 @@
+{
+  "name": "Marketing",
+  "description": "AI-powered motorcycle marketing site with TanStack AI chat assistant for Netlify.",
+  "phase": "example",
+  "modes": ["file-router"],
+  "type": "example",
+  "priority": 10,
+  "link": "",
+  "routes": [
+    {
+      "url": "/",
+      "name": "Home",
+      "path": "src/routes/index.tsx",
+      "jsName": "MotorcyclesIndex"
+    },
+    {
+      "url": "/motorcycles/$motorcycleId",
+      "path": "src/routes/motorcycles/$motorcycleId.tsx",
+      "jsName": "MotorcycleDetail"
+    },
+    {
+      "url": "/api/motorcycle-chat",
+      "path": "src/routes/api.motorcycle-chat.ts",
+      "jsName": "MotorcycleChatAPI"
+    }
+  ],
+  "integrations": [],
+  "dependsOn": [],
+  "variables": []
+}
