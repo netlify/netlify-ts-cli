@@ -26,5 +26,13 @@
   ],
   "integrations": [],
   "dependsOn": [],
-  "variables": []
+  "variables": [],
+  "bareBones": {
+    "deleteFiles": [
+      "public/motorcycle-adventure.jpg",
+      "public/motorcycle-cruiser.jpg",
+      "public/motorcycle-sport.jpg",
+      "public/motorcycle-supersport.jpg"
+    ]
+  }
 }

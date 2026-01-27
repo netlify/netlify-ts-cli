@@ -11,4 +11,5 @@ export interface CliOptions {
   targetDir?: string
   install?: boolean
   force?: boolean
+  bareBones?: boolean
 }

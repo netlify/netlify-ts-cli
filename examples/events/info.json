@@ -51,5 +51,24 @@
     }
   ],
   "dependsOn": [],
-  "variables": []
+  "variables": [],
+  "bareBones": {
+    "deleteFiles": [
+      "public/background-2.jpg",
+      "public/background-3.jpg",
+      "public/background-4.jpg",
+      "public/speakers/hans-mueller.jpg",
+      "public/speakers/isabella-martinez.jpg",
+      "public/speakers/kenji-nakamura.jpg",
+      "public/speakers/marie-dubois.jpg",
+      "public/speakers/priya-sharma.jpg",
+      "public/talks/french-macaron-mastery.jpg",
+      "public/talks/neapolitan-pizza-tradition-meets-innovation.jpg",
+      "public/talks/savory-breads-of-the-mediterranean.jpg",
+      "public/talks/sourdough-from-starter-to-masterpiece.jpg",
+      "public/talks/the-art-of-the-perfect-tart.jpg",
+      "public/talks/the-science-of-sugar.jpg",
+      "public/talks/umami-in-pastry-east-meets-west.jpg"
+    ]
+  }
 }

@@ -22,6 +22,7 @@ const motorcycles: Array<Motorcycle> = [
     engineSize: 125,
     type: "scooter",
   },
+<% if (!addOnOption.project?.bareBones) { %>
   {
     id: 2,
     name: "Luna-C Voyager",
@@ -70,6 +71,7 @@ const motorcycles: Array<Motorcycle> = [
     engineSize: 1300,
     type: "supersport",
   },
+<% } %>
 ];
 
 export default motorcycles;

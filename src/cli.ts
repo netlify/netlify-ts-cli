@@ -1,4 +1,5 @@
-import { resolve, basename } from 'node:path'
+import { resolve, basename, join } from 'node:path'
+import { unlink } from 'node:fs/promises'
 import { Command, InvalidArgumentError } from 'commander'
 import chalk from 'chalk'
 import validatePackageName from 'validate-npm-package-name'
@@ -147,6 +148,11 @@ export function cli({
     .option(
       '-f, --force',
       'force project creation even if the target directory is not empty',
+      false,
+    )
+    .option(
+      '--bare-bones',
+      'create minimal scaffolding for LLM modification',
       false,
     )
 
@@ -304,11 +310,33 @@ export function cli({
       git: options.git !== false,
       install: options.install !== false,
       chosenAddOns,
-      addOnOptions: populateAddOnOptionsDefaults(chosenAddOns),
+      addOnOptions: {
+        ...populateAddOnOptionsDefaults(chosenAddOns),
+        project: { bareBones: options.bareBones ?? false },
+      },
     }
 
     environment.intro(`Creating a new ${appName} app in ${resolvedProjectName}...`)
     await createApp(environment, finalOptions)
+
+    // Delete files specified in bareBones.deleteFiles for each add-on when in bare-bones mode
+    if (options.bareBones) {
+      for (const addOn of chosenAddOns) {
+        const addOnWithBareBones = addOn as typeof addOn & {
+          bareBones?: { deleteFiles?: Array<string> }
+        }
+        if (addOnWithBareBones.bareBones?.deleteFiles) {
+          for (const file of addOnWithBareBones.bareBones.deleteFiles) {
+            const filePath = join(targetDir, file)
+            try {
+              await unlink(filePath)
+            } catch {
+              // File may not exist, ignore errors
+            }
+          }
+        }
+      }
+    }
   })
 
   program.parse()

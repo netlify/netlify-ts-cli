@@ -31,5 +31,13 @@
     }
   ],
   "dependsOn": [],
-  "variables": []
+  "variables": [],
+  "bareBones": {
+    "deleteFiles": [
+      "public/jungle.jpg",
+      "public/mountains.jpg",
+      "public/snorkeling.jpg",
+      "public/waterfall.jpg"
+    ]
+  }
 }
