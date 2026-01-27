@@ -1,4 +1,3 @@
-<% if (addOnOption.project?.bareBones) { %>
 import { toolDefinition } from '@tanstack/ai'
 import { z } from 'zod'
 
@@ -29,7 +28,3 @@ export const getWeather = getWeatherToolDef.server(({ city }) => {
     humidity: Math.floor(Math.random() * 50) + 30,
   }
 })
-<% } else { %>
-// This file is only used in bare-bones mode
-export {}
-<% } %>
