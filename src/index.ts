@@ -7,7 +7,7 @@ import {
   scanAddOnDirectories,
   scanProjectDirectory,
 } from '@tanstack/cta-engine'
-import { cli } from '@tanstack/cta-cli'
+import { cli } from './cli.js'
 
 const projectDirectory = join(
   dirname(dirname(fileURLToPath(import.meta.url))),
