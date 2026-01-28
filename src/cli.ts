@@ -144,11 +144,16 @@ export function cli({
     .option(
       '--target-dir <path>',
       'the target directory for the application root',
+      '.',
     )
     .option(
       '-f, --force',
       'force project creation even if the target directory is not empty',
-      false,
+      true,
+    )
+    .option(
+      '--no-force',
+      'refuse to create if the target directory is not empty',
     )
     .option(
       '--bare-bones',
@@ -260,24 +265,22 @@ export function cli({
       return
     }
 
-    // Handle project creation
-    if (!projectName) {
-      console.error('Project name is required')
+    // Handle project creation: target-dir defaults to current directory
+    const targetDir = resolve(options.targetDir ?? '.')
+    const isCurrentDir = targetDir === resolve(process.cwd())
+
+    let resolvedProjectName: string
+    if (projectName) {
+      resolvedProjectName =
+        projectName === '.'
+          ? sanitizePackageName(getCurrentDirectoryName())
+          : sanitizePackageName(projectName)
+    } else if (isCurrentDir) {
+      resolvedProjectName = sanitizePackageName(getCurrentDirectoryName())
+    } else {
+      console.error('Project name is required when --target-dir is not the current directory')
       program.help()
       return
-    }
-
-    let resolvedProjectName = projectName
-    let targetDir: string
-
-    // Handle "." as project name - use current directory
-    if (projectName === '.') {
-      resolvedProjectName = sanitizePackageName(getCurrentDirectoryName())
-      targetDir = resolve(process.cwd())
-    } else {
-      targetDir = options.targetDir
-        ? resolve(options.targetDir)
-        : resolve(process.cwd(), projectName)
     }
 
     const { valid, error } = validateProjectName(resolvedProjectName)
