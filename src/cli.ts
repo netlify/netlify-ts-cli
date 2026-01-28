@@ -153,7 +153,11 @@ export function cli({
     .option(
       '--bare-bones',
       'create minimal scaffolding for LLM modification',
-      false,
+      true,
+    )
+    .option(
+      '--no-bare-bones',
+      'create full scaffolding (not minimal)',
     )
 
   program.action(async (projectName: string, options: CliOptions) => {
@@ -312,7 +316,7 @@ export function cli({
       chosenAddOns,
       addOnOptions: {
         ...populateAddOnOptionsDefaults(chosenAddOns),
-        project: { bareBones: options.bareBones ?? false },
+        project: { bareBones: options.bareBones ?? true },
       },
     }
 
@@ -320,7 +324,7 @@ export function cli({
     await createApp(environment, finalOptions)
 
     // Delete files specified in bareBones.deleteFiles for each add-on when in bare-bones mode
-    if (options.bareBones) {
+    if (options.bareBones !== false) {
       for (const addOn of chosenAddOns) {
         const addOnWithBareBones = addOn as typeof addOn & {
           bareBones?: { deleteFiles?: Array<string> }
