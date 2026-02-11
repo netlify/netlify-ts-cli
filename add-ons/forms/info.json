@@ -1,0 +1,21 @@
+{
+  "name": "Netlify Forms",
+  "phase": "add-on",
+  "description": "Add a signup form powered by Netlify Forms with spam protection via honeypot field. No server-side code required.",
+  "link": "https://docs.netlify.com/forms/setup/",
+  "modes": ["file-router"],
+  "type": "add-on",
+  "priority": 20,
+  "routes": [
+    {
+      "icon": "FormInput",
+      "url": "/form-example",
+      "name": "Form Example",
+      "path": "src/routes/form-example.tsx",
+      "jsName": "FormExample"
+    }
+  ],
+  "integrations": [],
+  "dependsOn": [],
+  "variables": []
+}
