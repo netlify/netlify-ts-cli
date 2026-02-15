@@ -1,0 +1,19 @@
+{
+  "name": "Dashboard",
+  "description": "An analytics dashboard with charts built with Chart.js, TanStack Start, and Tailwind CSS for Netlify.",
+  "phase": "example",
+  "modes": ["file-router"],
+  "type": "example",
+  "priority": 10,
+  "link": "",
+  "routes": [
+    {
+      "url": "/",
+      "path": "src/routes/index.tsx",
+      "jsName": "Home"
+    }
+  ],
+  "integrations": [],
+  "dependsOn": [],
+  "variables": []
+}

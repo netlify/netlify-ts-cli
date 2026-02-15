@@ -1,0 +1,40 @@
+{
+  "name": "Ecommerce",
+  "description": "A motorcycle ecommerce site with Stripe checkout and AI shopping assistant built with TanStack Start for Netlify.",
+  "phase": "example",
+  "modes": ["file-router"],
+  "type": "example",
+  "priority": 10,
+  "link": "",
+  "routes": [
+    {
+      "url": "/",
+      "name": "Home",
+      "path": "src/routes/index.tsx",
+      "jsName": "MotorcyclesIndex"
+    },
+    {
+      "url": "/motorcycles/$motorcycleId",
+      "path": "src/routes/motorcycles/$motorcycleId.tsx",
+      "jsName": "MotorcycleDetail"
+    },
+    {
+      "url": "/checkout/success",
+      "path": "src/routes/checkout/success.tsx",
+      "jsName": "CheckoutSuccess"
+    },
+    {
+      "url": "/checkout/cancel",
+      "path": "src/routes/checkout/cancel.tsx",
+      "jsName": "CheckoutCancel"
+    },
+    {
+      "url": "/api/motorcycle-chat",
+      "path": "src/routes/api.motorcycle-chat.ts",
+      "jsName": "MotorcycleChatAPI"
+    }
+  ],
+  "integrations": [],
+  "dependsOn": [],
+  "variables": []
+}

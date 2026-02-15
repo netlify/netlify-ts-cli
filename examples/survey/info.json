@@ -1,0 +1,19 @@
+{
+  "name": "Survey",
+  "description": "A movie survey form using Netlify Forms with TanStack Start for Netlify.",
+  "phase": "example",
+  "modes": ["file-router"],
+  "type": "example",
+  "priority": 10,
+  "link": "",
+  "routes": [
+    {
+      "url": "/",
+      "path": "src/routes/index.tsx",
+      "jsName": "Home"
+    }
+  ],
+  "integrations": [],
+  "dependsOn": [],
+  "variables": []
+}

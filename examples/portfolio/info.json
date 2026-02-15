@@ -1,0 +1,56 @@
+{
+  "name": "Portfolio",
+  "description": "A developer portfolio with resume, blog, projects, and AI assistant built with content-collections and TanStack Start for Netlify.",
+  "phase": "example",
+  "modes": ["file-router"],
+  "type": "example",
+  "priority": 10,
+  "link": "",
+  "routes": [
+    {
+      "url": "/",
+      "path": "src/routes/index.tsx",
+      "jsName": "BlogIndex"
+    },
+    {
+      "url": "/resume",
+      "name": "Resume",
+      "icon": "FileText",
+      "path": "src/routes/resume.tsx",
+      "jsName": "Resume"
+    },
+    {
+      "url": "/projects",
+      "name": "Projects",
+      "icon": "FolderGit2",
+      "path": "src/routes/projects.tsx",
+      "jsName": "Projects"
+    },
+    {
+      "url": "/contact",
+      "name": "Contact",
+      "icon": "Mail",
+      "path": "src/routes/contact.tsx",
+      "jsName": "Contact"
+    },
+    {
+      "url": "/blog/$slug",
+      "path": "src/routes/blog/$slug.tsx",
+      "jsName": "BlogPost"
+    },
+    {
+      "url": "/api/resume-chat",
+      "path": "src/routes/api.resume-chat.ts",
+      "jsName": "ResumeChatAPI"
+    }
+  ],
+  "integrations": [
+    {
+      "type": "vite-plugin",
+      "import": "import contentCollections from '@content-collections/vite'",
+      "code": "contentCollections()"
+    }
+  ],
+  "dependsOn": [],
+  "variables": []
+}
