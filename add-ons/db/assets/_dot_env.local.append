@@ -1,0 +1,2 @@
+# Netlify DB - run `netlify db:init` to set up your database
+# DATABASE_URL is automatically set by Netlify after initialization

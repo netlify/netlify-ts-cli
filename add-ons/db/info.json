@@ -1,0 +1,21 @@
+{
+  "name": "Netlify DB",
+  "phase": "add-on",
+  "description": "Add a guestbook demo powered by Netlify DB (Postgres) with Drizzle ORM. Demonstrates full CRUD with a serverless database.",
+  "link": "https://docs.netlify.com/database/overview/",
+  "modes": ["file-router"],
+  "type": "add-on",
+  "priority": 20,
+  "routes": [
+    {
+      "icon": "Database",
+      "url": "/db-example",
+      "name": "DB Example",
+      "path": "src/routes/db-example.tsx",
+      "jsName": "DBExample"
+    }
+  ],
+  "integrations": [],
+  "dependsOn": [],
+  "variables": []
+}
