@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { db, schema } from "@/db";
 import { desc } from "drizzle-orm";
 
-export const getEntries = createServerFn({ method: "GET" }).handler(
+export const getEntries = createServerFn({ method: "POST" }).handler(
   async () => {
     const entries = await db
       .select()

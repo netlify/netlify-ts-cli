@@ -1,7 +1,8 @@
 {
   "dependencies": {
     "drizzle-orm": "^0.44.0",
-    "@neondatabase/serverless": "^1.0.0"
+    "@neondatabase/serverless": "^1.0.0",
+    "@netlify/neon": "^0.1.2"
   },
   "devDependencies": {
     "drizzle-kit": "^0.31.0"

@@ -18,15 +18,16 @@ function DBExample() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const form = e.currentTarget;
     setIsSubmitting(true);
 
-    const formData = new FormData(e.currentTarget);
+    const formData = new FormData(form);
     const name = formData.get("name") as string;
     const message = formData.get("message") as string;
 
     try {
       await addEntry({ data: { name, message } });
-      e.currentTarget.reset();
+      form.reset();
       await router.invalidate();
     } catch (error) {
       console.error("Failed to add entry:", error);
