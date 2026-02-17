@@ -1,0 +1,12 @@
+### Chart.js Dashboard
+
+Analytics dashboard with Chart.js and react-chartjs-2.
+
+**Dependencies:** chart.js, react-chartjs-2
+
+**Chart types:**
+- Bar - Revenue by month
+- Line - User growth
+- Doughnut - Sales by category
+
+**Setup:** Register Chart.js components before use (CategoryScale, LinearScale, BarElement, LineElement, PointElement, ArcElement, Title, Tooltip, Legend, Filler).

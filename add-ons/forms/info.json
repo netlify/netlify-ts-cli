@@ -6,16 +6,12 @@
   "modes": ["file-router"],
   "type": "add-on",
   "priority": 20,
-  "routes": [
-    {
-      "icon": "FormInput",
-      "url": "/form-example",
-      "name": "Form Example",
-      "path": "src/routes/form-example.tsx",
-      "jsName": "FormExample"
-    }
-  ],
+  "routes": [{"icon": "FormInput", "url": "/form-example", "name": "Form Example", "path": "src/routes/form-example.tsx", "jsName": "FormExample"}],
   "integrations": [],
   "dependsOn": [],
-  "variables": []
+  "variables": [],
+  "packageFileDescriptions": {
+    "src/routes/form-example.tsx": "Form example route (/form-example): Netlify Forms signup with honeypot spam protection.",
+    "public/form-example.html": "Static HTML form declaration for Netlify Forms; name, email, bot-field."
+  }
 }

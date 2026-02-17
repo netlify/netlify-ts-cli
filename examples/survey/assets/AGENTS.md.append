@@ -1,0 +1,9 @@
+### Netlify Forms Survey
+
+Movie survey form using Netlify Forms.
+
+**Form:** `best-movie-survey` - name, movie select, reason textarea
+**Spam protection:** `netlify-honeypot="bot-field"` + hidden bot-field input
+**Detection:** `public/form-survey.html` declares the form (hidden) for Netlify build detection
+
+No environment variables. Works after deploy to Netlify.

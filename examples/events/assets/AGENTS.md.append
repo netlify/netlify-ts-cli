@@ -1,0 +1,21 @@
+### Conference Site Integration
+
+Pastry conference website with Content Collections (speakers, talks) and Remy AI assistant.
+
+**Content Collections:**
+- `speakers` - name, title, specialty, restaurant, headshot, awards
+- `talks` - title, speaker, duration, topics, image
+- Schemas in `content-collections.ts`
+
+**AI tools available (RemyAssistant):**
+- `getSpeakerBySlug` - Get speaker profile by slug
+- `getTalkBySlug` - Get talk details by slug
+- `getAllSpeakers` - List all speakers
+- `getAllTalks` - List all talks
+- `getSchedule` - Get full schedule
+
+**Components:** HeroCarousel (background images), RemyAssistant (conference Q&A)
+
+## Environment Variables
+
+For AI: ANTHROPIC_API_KEY, OPENAI_API_KEY, GEMINI_API_KEY, or OLLAMA_BASE_URL (same as ai add-on).

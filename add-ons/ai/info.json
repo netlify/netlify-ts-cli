@@ -6,22 +6,16 @@
   "modes": ["file-router"],
   "type": "add-on",
   "priority": 20,
-  "routes": [
-    {
-      "icon": "MessagesSquare",
-      "url": "/chat",
-      "name": "Chat",
-      "path": "src/routes/chat.tsx",
-      "jsName": "ChatPage"
-    }
-  ],
-  "integrations": [
-    {
-      "type": "header-user",
-      "path": "src/components/AIAssistant.tsx",
-      "jsName": "AIAssistant"
-    }
-  ],
+  "routes": [{"icon": "MessagesSquare", "url": "/chat", "name": "Chat", "path": "src/routes/chat.tsx", "jsName": "ChatPage"}],
+  "integrations": [{"type": "header-user", "path": "src/components/AIAssistant.tsx", "jsName": "AIAssistant"}],
   "dependsOn": [],
-  "variables": []
+  "variables": [],
+  "packageFileDescriptions": {
+    "src/lib/ai-hook.ts": "useAIChat hook: useChat with fetchServerSentEvents connection to /api/chat.",
+    "src/routes/chat.tsx": "Chat page route (/chat): Weather Chat UI with messages, input form, send/stop.",
+    "src/routes/api.chat.ts": "POST handler for /api/chat: multi-provider AI (Anthropic, OpenAI, Gemini, Ollama) with getWeather tool and SSE streaming.",
+    "src/lib/weather-tools.ts": "TanStack AI getWeather tool definition; server returns mock temperature, condition, humidity for a city.",
+    "src/routes/chat.css": "Chat page styles: prose/markdown, scrollbar, message animations.",
+    "src/components/AIAssistant.tsx": "Pop-up AI assistant component for header; toggleable chat panel with useAIChat."
+  }
 }

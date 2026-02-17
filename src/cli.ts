@@ -16,6 +16,7 @@ import {
   populateAddOnOptionsDefaults,
 } from '@tanstack/cta-engine'
 
+import { generateAgentsMd } from './agents-md.js'
 import type { CliOptions } from './types.js'
 import type {
   Options,
@@ -344,6 +345,9 @@ export function cli({
         }
       }
     }
+
+    // Generate an AGENTS.md file in the root of the project
+    await generateAgentsMd(targetDir, resolvedProjectName, chosenAddOns as Array<{ packageFileDescriptions?: Record<string, string> }>)
   })
 
   program.parse()

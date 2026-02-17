@@ -6,16 +6,16 @@
   "modes": ["file-router"],
   "type": "add-on",
   "priority": 20,
-  "routes": [
-    {
-      "icon": "Database",
-      "url": "/db-example",
-      "name": "DB Example",
-      "path": "src/routes/db-example.tsx",
-      "jsName": "DBExample"
-    }
-  ],
+  "routes": [{"icon": "Database", "url": "/db-example", "name": "DB Example", "path": "src/routes/db-example.tsx", "jsName": "DBExample"}],
   "integrations": [],
   "dependsOn": [],
-  "variables": []
+  "variables": [],
+  "packageFileDescriptions": {
+    "DB-SETUP.md": "Setup guide: link to Netlify, run netlify db init, configure DATABASE_URL.",
+    "src/routes/db-example.tsx": "Guestbook route (/db-example): form to add entries, list from getEntries/addEntry.",
+    "src/server/guestbook.functions.ts": "Server functions: getEntries (list), addEntry (create) for guestbook via Drizzle.",
+    "src/db/index.ts": "Drizzle + Neon client; exports db and schema.",
+    "src/db/schema.ts": "Guestbook table schema: id, name, message, createdAt.",
+    "drizzle.config.ts": "Drizzle Kit config for migrations; postgres, schema path, DATABASE_URL."
+  }
 }

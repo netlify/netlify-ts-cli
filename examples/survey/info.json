@@ -6,14 +6,13 @@
   "type": "example",
   "priority": 10,
   "link": "",
-  "routes": [
-    {
-      "url": "/",
-      "path": "src/routes/index.tsx",
-      "jsName": "Home"
-    }
-  ],
+  "routes": [{"url": "/", "path": "src/routes/index.tsx", "jsName": "Home"}],
   "integrations": [],
   "dependsOn": [],
-  "variables": []
+  "variables": [],
+  "packageFileDescriptions": {
+    "src/routes/index.tsx": "Survey home: renders SurveyForm.",
+    "src/components/SurveyForm.tsx": "Movie survey: favorite pick, Netlify Forms with honeypot.",
+    "public/form-survey.html": "Static HTML form declaration for Netlify Forms."
+  }
 }

@@ -1,0 +1,22 @@
+### Netlify DB Integration
+
+Guestbook demo powered by Netlify DB (Neon Postgres) with Drizzle ORM.
+
+**Setup:**
+1. Link project: `netlify login` then `netlify init`
+2. Provision database: `netlify db init` (creates Neon Postgres, sets `DATABASE_URL`)
+3. Push schema: `npx drizzle-kit push` (creates `guestbook` table from `src/db/schema.ts`)
+4. Run locally: `netlify dev` (visit `/db-example`)
+
+**Key files:**
+- `src/db/schema.ts` - Guestbook table (id, name, message, createdAt)
+- `src/server/guestbook.functions.ts` - Server functions: `getEntries`, `addEntry`
+- `drizzle.config.ts` - Drizzle Kit config for migrations
+
+**Dependencies:** drizzle-orm, @neondatabase/serverless, drizzle-kit
+
+## Environment Variables
+
+```
+DATABASE_URL=...  # Auto-set by netlify db init; pull with netlify env:pull
+```

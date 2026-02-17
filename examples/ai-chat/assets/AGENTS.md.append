@@ -1,0 +1,24 @@
+### AI Integration
+
+Multi-provider AI chat with fallback chain:
+
+1. Anthropic Claude (preferred)
+2. OpenAI GPT-4o
+3. Google Gemini
+4. Ollama (local)
+
+**Tools available to AI:**
+- `getWeather` - Get the current weather for a city. Returns temperature, condition, and humidity.
+
+## Environment Variables
+
+For AI functionality, set one or more:
+
+```
+ANTHROPIC_API_KEY=...
+OPENAI_API_KEY=...
+GOOGLE_GENERATIVE_AI_API_KEY=...
+OLLAMA_BASE_URL=...
+```
+
+The application uses the first available provider in the fallback chain.
