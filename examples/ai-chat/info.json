@@ -10,6 +10,7 @@
     {"url": "/", "path": "src/routes/index.tsx", "jsName": "Home"},
     {"url": "/api/chat", "path": "src/routes/api.chat.ts", "jsName": "ChatAPI"}
   ],
+  "features": ["tanstack-start", "tanstack-ai"],
   "integrations": [],
   "dependsOn": [],
   "variables": [],

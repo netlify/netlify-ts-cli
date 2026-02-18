@@ -7,6 +7,7 @@
   "type": "add-on",
   "priority": 20,
   "routes": [{"icon": "Database", "url": "/db-example", "name": "DB Example", "path": "src/routes/db-example.tsx", "jsName": "DBExample"}],
+  "features": ["netlify-db"],
   "integrations": [],
   "dependsOn": [],
   "variables": [],

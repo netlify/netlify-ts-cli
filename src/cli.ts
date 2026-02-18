@@ -183,6 +183,7 @@ export function cli({
           name: addon.name,
           description: addon.description,
           type: addon.type,
+          features: (addon as unknown as { features?: Array<string> }).features ?? [],
           options: addon.options,
         }))
       console.log(JSON.stringify(serialized, null, 2))

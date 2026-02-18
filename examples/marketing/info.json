@@ -11,6 +11,7 @@
     {"url": "/motorcycles/$motorcycleId", "path": "src/routes/motorcycles/$motorcycleId.tsx", "jsName": "MotorcycleDetail"},
     {"url": "/api/motorcycle-chat", "path": "src/routes/api.motorcycle-chat.ts", "jsName": "MotorcycleChatAPI"}
   ],
+  "features": ["tanstack-start", "tanstack-ai"],
   "integrations": [],
   "dependsOn": [],
   "variables": [],

@@ -7,6 +7,7 @@
   "type": "add-on",
   "priority": 20,
   "routes": [{"icon": "FormInput", "url": "/form-example", "name": "Form Example", "path": "src/routes/form-example.tsx", "jsName": "FormExample"}],
+  "features": ["netlify-forms"],
   "integrations": [],
   "dependsOn": [],
   "variables": [],

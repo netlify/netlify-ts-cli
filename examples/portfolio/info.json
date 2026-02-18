@@ -14,6 +14,7 @@
     {"url": "/blog/$slug", "path": "src/routes/blog/$slug.tsx", "jsName": "BlogPost"},
     {"url": "/api/resume-chat", "path": "src/routes/api.resume-chat.ts", "jsName": "ResumeChatAPI"}
   ],
+  "features": ["tanstack-start", "content-collections", "netlify-forms"],
   "integrations": [{"type": "vite-plugin", "import": "import contentCollections from '@content-collections/vite'", "code": "contentCollections()"}],
   "dependsOn": [],
   "variables": [],

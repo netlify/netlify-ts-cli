@@ -7,6 +7,7 @@
   "type": "add-on",
   "priority": 20,
   "routes": [{"icon": "MessagesSquare", "url": "/chat", "name": "Chat", "path": "src/routes/chat.tsx", "jsName": "ChatPage"}],
+  "features": ["tanstack-ai"],
   "integrations": [{"type": "header-user", "path": "src/components/AIAssistant.tsx", "jsName": "AIAssistant"}],
   "dependsOn": [],
   "variables": [],

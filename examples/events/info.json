@@ -15,6 +15,7 @@
     {"url": "/talks/$slug", "path": "src/routes/talks.$slug.tsx", "jsName": "TalkDetail"},
     {"url": "/api/remy-chat", "path": "src/routes/api.remy-chat.ts", "jsName": "RemyChatAPI"}
   ],
+  "features": ["tanstack-start", "content-collections", "tanstack-ai"],
   "integrations": [{"type": "vite-plugin", "import": "import contentCollections from '@content-collections/vite'", "code": "contentCollections()"}],
   "dependsOn": [],
   "variables": [],

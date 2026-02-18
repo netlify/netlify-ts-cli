@@ -10,6 +10,7 @@
     {"url": "/", "path": "src/routes/index.tsx", "jsName": "Home"},
     {"url": "/faq", "name": "FAQ", "icon": "HelpCircle", "path": "src/routes/faq.tsx", "jsName": "FAQ"}
   ],
+  "features": ["tanstack-start"],
   "integrations": [],
   "dependsOn": [],
   "variables": [],

@@ -11,6 +11,7 @@
     {"url": "/posts/$slug", "path": "src/routes/posts.$slug.tsx", "jsName": "BlogPost"},
     {"url": "/category/$category", "path": "src/routes/category.$category.tsx", "jsName": "BlogCategory"}
   ],
+  "features": ["tanstack-start", "content-collections", "tanstack-ai"],
   "integrations": [{"type": "vite-plugin", "import": "import contentCollections from '@content-collections/vite'", "code": "contentCollections()"}],
   "dependsOn": [],
   "variables": [],

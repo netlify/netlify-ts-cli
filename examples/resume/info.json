@@ -7,6 +7,7 @@
   "priority": 10,
   "link": "",
   "routes": [{"url": "/", "path": "src/routes/index.tsx", "jsName": "ResumeHome"}],
+  "features": ["tanstack-start", "content-collections", "tanstack-ai"],
   "integrations": [{"type": "vite-plugin", "import": "import contentCollections from '@content-collections/vite'", "code": "contentCollections()"}],
   "dependsOn": [],
   "variables": [],
