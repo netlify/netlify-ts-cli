@@ -1,9 +1,0 @@
-### SaaS Landing Page
-
-Landing page with pricing tiers, features section, and FAQ accordion.
-
-**Routes:** / (hero, pricing, features), /faq (accordion Q&A)
-
-**FAQ:** ChevronDown accordion with expand/collapse; pricing tiers: Starter (free), Pro, Enterprise
-
-No special dependencies or environment variables beyond base TanStack Start.

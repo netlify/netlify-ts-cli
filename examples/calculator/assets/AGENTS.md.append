@@ -1,9 +1,0 @@
-### Calculator Component
-
-iOS-style calculator built with React `useReducer` for state management.
-
-**State pattern:** `display`, `previousValue`, `operation`, `overwrite`
-
-**Actions:** ADD_DIGIT, CHOOSE_OPERATION, EVALUATE, CLEAR, DELETE_DIGIT, PERCENT, TOGGLE_SIGN
-
-No special dependencies beyond base TanStack Start. Pure React + Tailwind CSS.
