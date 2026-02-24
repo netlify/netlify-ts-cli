@@ -10,9 +10,9 @@ import validatePackageName from 'validate-npm-package-name'
 
 import type { CliOptions } from './types.js'
 
-const GITHUB_REPO = 'https://github.com/jherr/kdh-templates.git'
+const GITHUB_REPO = 'https://github.com/netlify/swar-templates.git'
 const MANIFEST_URL =
-  'https://raw.githubusercontent.com/jherr/kdh-templates/main/manifest.json'
+  'https://raw.githubusercontent.com/netlify/swar-templates/main/manifest.json'
 
 function sanitizePackageName(name: string): string {
   return name
@@ -119,6 +119,12 @@ export function cli() {
       }
     }
 
+    // Delete index.html if it exists in the target directory
+    const indexHtmlPath = join(targetDir, 'index.html')
+    if (existsSync(indexHtmlPath)) {
+      await rm(indexHtmlPath)
+    }
+
     console.log(
       chalk.bold.cyan(
         `Creating a new Netlify TanStack Start app in ${chalk.white(targetDir)}...`,
@@ -126,16 +132,23 @@ export function cli() {
     )
     console.log(chalk.gray(`Using starter: ${starterId}`))
 
+    // Fetch manifest to resolve frameworkId for this starter
+    type StarterEntry = { id: string; framework?: string }
+    const manifest = await fetch(MANIFEST_URL).then((r) => r.json()) as { starters: StarterEntry[] }
+    const starterEntry = manifest.starters.find((s) => s.id === starterId)
+    const frameworkId = starterEntry?.framework
+
     // Sparse clone the template repo into a temp directory
     const tmpDir = await mkdtemp(join(tmpdir(), 'netlify-cta-'))
     try {
       console.log(chalk.gray('⟳ Fetching template...'))
+      const sparsePaths = [`starters/${starterId}`, ...(frameworkId ? [`frameworks/${frameworkId}`] : [])]
       execSync(
         `git clone --depth=1 --filter=blob:none --sparse ${GITHUB_REPO} ${tmpDir}`,
         { stdio: 'pipe' },
       )
       execSync(
-        `git -C ${tmpDir} sparse-checkout set starters/${starterId}`,
+        `git -C ${tmpDir} sparse-checkout set ${sparsePaths.join(' ')}`,
         { stdio: 'pipe' },
       )
 
@@ -151,6 +164,18 @@ export function cli() {
 
       // Copy starter files to target directory
       await cp(starterPath, targetDir, { recursive: true })
+
+      // Copy framework overlay files if they exist
+      if (frameworkId) {
+        const frameworkPath = join(tmpDir, 'frameworks', frameworkId)
+        if (existsSync(frameworkPath)) {
+          console.log(chalk.gray(`⟳ Applying framework overlay (${frameworkId})...`))
+          await cp(frameworkPath, targetDir, { recursive: true })
+          console.log(chalk.green(`✓ Framework overlay applied (${frameworkId})`))
+        } else {
+          console.log(chalk.yellow(`⚠ Framework overlay "${frameworkId}" not found in repo, skipping`))
+        }
+      }
 
       // Update package.json name if a project name was provided
       if (projectName && projectName !== '.') {
