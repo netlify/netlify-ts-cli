@@ -4,6 +4,5 @@ export interface CliOptions {
   addOns: string | boolean | undefined
   listAddonsJson: boolean
   git: boolean
-  force: boolean | undefined
   targetDir: string | undefined
 }

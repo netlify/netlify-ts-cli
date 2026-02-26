@@ -1,5 +1,5 @@
 import { resolve, basename } from 'node:path'
-import { existsSync, readdirSync } from 'node:fs'
+import { existsSync } from 'node:fs'
 import { cp, rm, mkdtemp, readFile, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -72,10 +72,6 @@ export function cli() {
       '--target-dir <path>',
       'the target directory for the application root',
     )
-    .option(
-      '-f, --force',
-      'force project creation even if the target directory is not empty',
-    )
 
   program.action(async (projectName: string | undefined, options: CliOptions) => {
     // Handle --list-addons-json
@@ -104,19 +100,6 @@ export function cli() {
     if (!valid) {
       console.error(chalk.red(error))
       process.exit(1)
-    }
-
-    // Check if target directory exists and is non-empty
-    if (existsSync(targetDir)) {
-      const contents = readdirSync(targetDir)
-      if (contents.length > 0 && !options.force) {
-        console.error(
-          chalk.red(
-            `Target directory "${targetDir}" is not empty. Use --force to overwrite.`,
-          ),
-        )
-        process.exit(1)
-      }
     }
 
     // Delete index.html if it exists in the target directory

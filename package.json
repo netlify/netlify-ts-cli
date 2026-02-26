@@ -1,6 +1,6 @@
 {
   "name": "kaddidlehopper",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "Create TanStack Start applications for Netlify",
   "bin": "./dist/index.js",
   "type": "module",
