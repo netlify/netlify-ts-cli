@@ -127,7 +127,7 @@ export function cli() {
       console.log(chalk.gray('⟳ Fetching template...'))
       const sparsePaths = [`starters/${starterId}`, ...(frameworkId ? [`frameworks/${frameworkId}`] : [])]
       execSync(
-        `git clone --depth=1 --filter=blob:none --sparse ${GITHUB_REPO} ${tmpDir}`,
+        `git clone --depth=1 --sparse ${GITHUB_REPO} ${tmpDir}`,
         { stdio: 'pipe' },
       )
       execSync(
