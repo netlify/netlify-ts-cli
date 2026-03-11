@@ -204,6 +204,21 @@ export function cli() {
       }
     }
 
+    // Copy .claude to .gemini and .codex if they don't exist
+    const claudeDir = join(targetDir, '.claude')
+    if (existsSync(claudeDir)) {
+      const geminiDir = join(targetDir, '.gemini')
+      if (!existsSync(geminiDir)) {
+        await cp(claudeDir, geminiDir, { recursive: true })
+        console.log(chalk.green('✓ Copied .claude to .gemini'))
+      }
+      const codexDir = join(targetDir, '.codex')
+      if (!existsSync(codexDir)) {
+        await cp(claudeDir, codexDir, { recursive: true })
+        console.log(chalk.green('✓ Copied .claude to .codex'))
+      }
+    }
+
     console.log(chalk.bold.green('\nDone! Your project is ready.'))
     console.log(chalk.white('\nNext steps:'))
     console.log(chalk.cyan(`  cd ${basename(targetDir)}`))
