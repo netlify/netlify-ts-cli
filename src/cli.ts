@@ -193,7 +193,12 @@ export function cli() {
         'pnpm'
       console.log(chalk.gray(`⟳ Installing dependencies with ${pm}...`))
       try {
-        execSync(`${pm} install`, { cwd: targetDir, stdio: 'inherit' })
+        let cmd = `${pm} install`
+        if (pm === 'npm') {
+          cmd += ' --no-audit --no-fund --prefer-offline'
+          console.log(chalk.gray(`  ${cmd}`))
+        }
+        execSync(cmd, { cwd: targetDir, stdio: 'inherit' })
         console.log(chalk.green('✓ Dependencies installed'))
       } catch {
         console.error(
