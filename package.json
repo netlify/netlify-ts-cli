@@ -1,5 +1,5 @@
 {
-  "name": "kaddidlehopper",
+  "name": "@netlify/ts-cli",
   "version": "0.7.4",
   "description": "Create TanStack Start applications for Netlify",
   "bin": "./dist/index.js",
