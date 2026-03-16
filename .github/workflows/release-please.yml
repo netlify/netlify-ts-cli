@@ -21,7 +21,7 @@ jobs:
         with:
           token: ${{ steps.get-token.outputs.token }}
           release-type: node
-          package-name: @netlify/ts-cli
+          package-name: "@netlify/ts-cli"
 
   publish:
     runs-on: ubuntu-latest
