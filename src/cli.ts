@@ -110,7 +110,7 @@ export function cli() {
 
     console.log(
       chalk.bold.cyan(
-        `Creating a new Netlify TanStack Start app in ${chalk.white(targetDir)}...`,
+        `Creating a new Netlify TanStack Start app in directory ${chalk.white(targetDir)}...`,
       ),
     )
     console.log(chalk.gray(`Using starter: ${starterId}`))
