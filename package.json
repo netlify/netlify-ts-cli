@@ -13,21 +13,19 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/TanStack/create-router-app.git"
+    "url": "https://github.com/netlify/netlify-ts-cli.git"
   },
-  "homepage": "https://tanstack.com/start",
+  "homepage": "https://netlify.com",
   "keywords": [
     "netlify",
-    "tanstack",
-    "tanstack-start",
-    "create-app"
+    "tanstack"
   ],
-  "author": "Jack Herrington <jherr@pobox.com>",
+  "author": "Jack Herrington <jack.herrington@netlify.com>",
   "license": "MIT",
   "publishConfig": {
     "access": "public"
   },
-  "packageManager": "pnpm@9.15.5",
+  "packageManager": "npm@10.9.2",
   "dependencies": {
     "chalk": "^5.4.1",
     "commander": "^13.1.0",
