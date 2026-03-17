@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/netlify/netlify-ts-cli/compare/v1.0.0...v1.0.1) (2026-03-17)
+
+
+### Bug Fixes
+
+* adding a lock file ([008d398](https://github.com/netlify/netlify-ts-cli/commit/008d39815d5a8ca66d299e03f1be42981e459a30))
+
 ## 1.0.0 (2026-03-17)
 
 
