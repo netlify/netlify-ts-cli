@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.2](https://github.com/netlify/netlify-ts-cli/compare/v1.0.1...v1.0.2) (2026-03-17)
+
+
+### Bug Fixes
+
+* changing access to public ([3df1b81](https://github.com/netlify/netlify-ts-cli/commit/3df1b814c56026d532313ff7d44d0d137ae73b6d))
+* changing access to public ([72794c3](https://github.com/netlify/netlify-ts-cli/commit/72794c3f6daf48fbaa354da1d94125189e553626))
+
 ## [1.0.1](https://github.com/netlify/netlify-ts-cli/compare/v1.0.0...v1.0.1) (2026-03-17)
 
 
