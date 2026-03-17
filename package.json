@@ -24,6 +24,9 @@
   ],
   "author": "Jack Herrington <jherr@pobox.com>",
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "packageManager": "pnpm@9.15.5",
   "dependencies": {
     "chalk": "^5.4.1",
