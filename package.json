@@ -1,6 +1,6 @@
 {
   "name": "@netlify/ts-cli",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Create TanStack Start applications for Netlify",
   "bin": "./dist/index.js",
   "type": "module",
