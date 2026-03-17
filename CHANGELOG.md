@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.3](https://github.com/netlify/netlify-ts-cli/compare/v1.0.2...v1.0.3) (2026-03-17)
+
+
+### Bug Fixes
+
+* more package fixups ([1a63c2e](https://github.com/netlify/netlify-ts-cli/commit/1a63c2e35b961d74e3738f9ed9f1aeed11094ce6))
+
 ## [1.0.2](https://github.com/netlify/netlify-ts-cli/compare/v1.0.1...v1.0.2) (2026-03-17)
 
 
