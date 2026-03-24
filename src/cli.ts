@@ -212,15 +212,10 @@ export function cli() {
     // Copy .claude to .gemini and .codex if they don't exist
     const claudeDir = join(targetDir, '.claude')
     if (existsSync(claudeDir)) {
-      const geminiDir = join(targetDir, '.gemini')
-      if (!existsSync(geminiDir)) {
-        await cp(claudeDir, geminiDir, { recursive: true })
-        console.log(chalk.green('✓ Copied .claude to .gemini'))
-      }
-      const codexDir = join(targetDir, '.codex')
-      if (!existsSync(codexDir)) {
-        await cp(claudeDir, codexDir, { recursive: true })
-        console.log(chalk.green('✓ Copied .claude to .codex'))
+      const agentsDir = join(targetDir, '.agents')
+      if (!existsSync(agentsDir)) {
+        await cp(claudeDir, agentsDir, { recursive: true })
+        console.log(chalk.green('✓ Copied .claude to .agents'))
       }
     }
 
