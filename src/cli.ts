@@ -1,6 +1,6 @@
 import { resolve, basename } from 'node:path'
 import { existsSync } from 'node:fs'
-import { cp, rm, mkdtemp, readFile, writeFile } from 'node:fs/promises'
+import { cp, rm, mkdtemp, readFile, writeFile, symlink } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { execSync } from 'node:child_process'
@@ -209,13 +209,13 @@ export function cli() {
       }
     }
 
-    // Copy .claude to .gemini and .codex if they don't exist
+    // Symlink .agents → .claude if .claude exists
     const claudeDir = join(targetDir, '.claude')
     if (existsSync(claudeDir)) {
       const agentsDir = join(targetDir, '.agents')
       if (!existsSync(agentsDir)) {
-        await cp(claudeDir, agentsDir, { recursive: true })
-        console.log(chalk.green('✓ Copied .claude to .agents'))
+        await symlink('.claude', agentsDir, 'dir')
+        console.log(chalk.green('✓ Linked .agents → .claude'))
       }
     }
 
