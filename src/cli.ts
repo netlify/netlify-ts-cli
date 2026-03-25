@@ -139,7 +139,7 @@ export function cli() {
       if (!existsSync(starterPath)) {
         console.error(
           chalk.red(
-            `Starter "${starterId}" not found in the template repo. Run --list-addons-json to see available starters.`,
+            `Starter "${starterId}" not found in the template repository. Run --list-addons-json to see available starters.`,
           ),
         )
         process.exit(1)
