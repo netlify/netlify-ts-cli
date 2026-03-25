@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.4](https://github.com/netlify/netlify-ts-cli/compare/v1.0.3...v1.0.4) (2026-03-25)
+
+
+### Bug Fixes
+
+* small text change to bump version ([e309a74](https://github.com/netlify/netlify-ts-cli/commit/e309a74051ed94e68286f0217935ba7ffba11633))
+
 ## [1.0.3](https://github.com/netlify/netlify-ts-cli/compare/v1.0.2...v1.0.3) (2026-03-17)
 
 
