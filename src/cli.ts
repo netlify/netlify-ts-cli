@@ -14,6 +14,33 @@ const GITHUB_REPO = 'https://github.com/netlify/swar-templates.git'
 const MANIFEST_URL =
   'https://raw.githubusercontent.com/netlify/swar-templates/main/manifest.json'
 
+// Local mirror produced by the SWAR build cache and preserved through agent-runner cleanDirectory.
+function localMirrorDir(): string | undefined {
+  const dir = join(process.cwd(), 'swar-templates')
+  return existsSync(dir) ? dir : undefined
+}
+
+function bailGitHubUnreachable(operation: string): never {
+  console.error(
+    chalk.red(
+      `Could not ${operation} from GitHub and no local swar-templates mirror is available. ` +
+        `GitHub may be experiencing an outage — please retry in a few minutes.`,
+    ),
+  )
+  process.exit(1)
+}
+
+async function loadManifest<T>(): Promise<T> {
+  try {
+    return (await fetch(MANIFEST_URL).then((r) => r.json())) as T
+  } catch {
+    const dir = localMirrorDir()
+    if (!dir) bailGitHubUnreachable('fetch manifest')
+    console.warn(chalk.yellow('⚠ Could not reach GitHub, using local swar-templates copy'))
+    return JSON.parse(await readFile(join(dir, 'manifest.json'), 'utf-8')) as T
+  }
+}
+
 function sanitizePackageName(name: string): string {
   return name
     .toLowerCase()
@@ -76,7 +103,7 @@ export function cli() {
   program.action(async (projectName: string | undefined, options: CliOptions) => {
     // Handle --list-addons-json
     if (options.listAddonsJson) {
-      const manifest = await fetch(MANIFEST_URL).then((r) => r.json()) as { starters: unknown }
+      const manifest = await loadManifest<{ starters: unknown }>()
       console.log(JSON.stringify(manifest.starters, null, 2))
       process.exit(0)
     }
@@ -117,25 +144,36 @@ export function cli() {
 
     // Fetch manifest to resolve frameworkId for this starter
     type StarterEntry = { id: string; framework?: string }
-    const manifest = await fetch(MANIFEST_URL).then((r) => r.json()) as { starters: StarterEntry[] }
+    const manifest = await loadManifest<{ starters: StarterEntry[] }>()
     const starterEntry = manifest.starters.find((s) => s.id === starterId)
     const frameworkId = starterEntry?.framework
 
-    // Sparse clone the template repo into a temp directory
-    const tmpDir = await mkdtemp(join(tmpdir(), 'netlify-cta-'))
+    // Resolve the source directory: sparse clone from GitHub, or fall back to the local mirror.
+    let srcDir: string
+    let cloneTmpDir: string | undefined
     try {
+      cloneTmpDir = await mkdtemp(join(tmpdir(), 'netlify-cta-'))
       console.log(chalk.gray('⟳ Fetching template...'))
       const sparsePaths = [`starters/${starterId}`, ...(frameworkId ? [`frameworks/${frameworkId}`] : [])]
+      execSync(`git clone --depth=1 --sparse ${GITHUB_REPO} ${cloneTmpDir}`, { stdio: 'pipe' })
       execSync(
-        `git clone --depth=1 --sparse ${GITHUB_REPO} ${tmpDir}`,
+        `git -C ${cloneTmpDir} sparse-checkout set ${sparsePaths.join(' ')}`,
         { stdio: 'pipe' },
       )
-      execSync(
-        `git -C ${tmpDir} sparse-checkout set ${sparsePaths.join(' ')}`,
-        { stdio: 'pipe' },
-      )
+      srcDir = cloneTmpDir
+    } catch {
+      if (cloneTmpDir) {
+        await rm(cloneTmpDir, { recursive: true, force: true })
+        cloneTmpDir = undefined
+      }
+      const dir = localMirrorDir()
+      if (!dir) bailGitHubUnreachable('clone template repo')
+      console.warn(chalk.yellow('⚠ Could not clone template repo, using local swar-templates copy'))
+      srcDir = dir
+    }
 
-      const starterPath = join(tmpDir, 'starters', starterId)
+    try {
+      const starterPath = join(srcDir, 'starters', starterId)
       if (!existsSync(starterPath)) {
         console.error(
           chalk.red(
@@ -150,7 +188,7 @@ export function cli() {
 
       // Copy framework overlay files if they exist
       if (frameworkId) {
-        const frameworkPath = join(tmpDir, 'frameworks', frameworkId)
+        const frameworkPath = join(srcDir, 'frameworks', frameworkId)
         if (existsSync(frameworkPath)) {
           console.log(chalk.gray(`⟳ Applying framework overlay (${frameworkId})...`))
           await cp(frameworkPath, targetDir, { recursive: true })
@@ -172,7 +210,9 @@ export function cli() {
 
       console.log(chalk.green(`✓ Template copied`))
     } finally {
-      await rm(tmpDir, { recursive: true, force: true })
+      if (cloneTmpDir) {
+        await rm(cloneTmpDir, { recursive: true, force: true })
+      }
     }
 
     // Initialize git repository
