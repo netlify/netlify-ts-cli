@@ -36,8 +36,13 @@ async function loadManifest<T>(): Promise<T> {
   } catch {
     const dir = localMirrorDir()
     if (!dir) bailGitHubUnreachable('fetch manifest')
-    console.warn(chalk.yellow('⚠ Could not reach GitHub, using local swar-templates copy'))
-    return JSON.parse(await readFile(join(dir, 'manifest.json'), 'utf-8')) as T
+    try {
+      const parsed = JSON.parse(await readFile(join(dir, 'manifest.json'), 'utf-8')) as T
+      console.warn(chalk.yellow('⚠ Could not reach GitHub, using local swar-templates copy'))
+      return parsed
+    } catch {
+      bailGitHubUnreachable('fetch manifest')
+    }
   }
 }
 
@@ -145,8 +150,7 @@ export function cli() {
     // Fetch manifest to resolve frameworkId for this starter
     type StarterEntry = { id: string; framework?: string }
     const manifest = await loadManifest<{ starters: StarterEntry[] }>()
-    const starterEntry = manifest.starters.find((s) => s.id === starterId)
-    const frameworkId = starterEntry?.framework
+    let frameworkId = manifest.starters.find((s) => s.id === starterId)?.framework
 
     // Resolve the source directory: sparse clone from GitHub, or fall back to the local mirror.
     let srcDir: string
@@ -170,6 +174,17 @@ export function cli() {
       if (!dir) bailGitHubUnreachable('clone template repo')
       console.warn(chalk.yellow('⚠ Could not clone template repo, using local swar-templates copy'))
       srcDir = dir
+
+      // Re-read manifest from the local mirror; the GitHub manifest we just used may reference
+      // a starter or framework that swar-build-cache hasn't picked up yet.
+      try {
+        const localManifest = JSON.parse(
+          await readFile(join(dir, 'manifest.json'), 'utf-8'),
+        ) as { starters: StarterEntry[] }
+        frameworkId = localManifest.starters.find((s) => s.id === starterId)?.framework
+      } catch {
+        bailGitHubUnreachable('clone template repo')
+      }
     }
 
     try {
