@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.1.0](https://github.com/netlify/netlify-ts-cli/compare/v1.0.4...v1.1.0) (2026-04-28)
+
+
+### Features
+
+* **cli:** clean up local mirror after scaffolding (EX-2098) ([6e72b20](https://github.com/netlify/netlify-ts-cli/commit/6e72b20a8772d5d9a33c9f2f8c066811ff9f0b2c))
+* fall back to local swar-templates mirror on GitHub failure (EX-2098) ([97eeb77](https://github.com/netlify/netlify-ts-cli/commit/97eeb775948167543ef1b4fde9ab16a4c57a8921))
+* use local swar-templates copy from .netlify/cache when github is unreachable ([7e405ce](https://github.com/netlify/netlify-ts-cli/commit/7e405ce593d4a12debccfeed6f337a314c95d0d3))
+
+
+### Bug Fixes
+
+* **cli:** bail on broken local manifest and re-resolve frameworkId after fallback (EX-2098) ([15fb236](https://github.com/netlify/netlify-ts-cli/commit/15fb236c8c3ad2694a688c134e08485e6adf3ad1))
+* **cli:** point local mirror at .netlify/cache/swar-templates (EX-2098) ([7ccca87](https://github.com/netlify/netlify-ts-cli/commit/7ccca877bd406776d50aaa5eeaa919f6a877bd75))
+* **cli:** use .netlify/cache/cwd/swar-templates path written by utils.cache.save (EX-2098) ([40ddbc8](https://github.com/netlify/netlify-ts-cli/commit/40ddbc85089587bbe48c9071cc6e46ca10f972c1))
+
 ## [1.0.4](https://github.com/netlify/netlify-ts-cli/compare/v1.0.3...v1.0.4) (2026-03-25)
 
 
