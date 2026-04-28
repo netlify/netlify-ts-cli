@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.1.1](https://github.com/netlify/netlify-ts-cli/compare/v1.1.0...v1.1.1) (2026-04-28)
+
+
+### Bug Fixes
+
+* **cli:** use NETLIFY_BUILD_BASE for local mirror cache path (EX-2098) ([3de24a0](https://github.com/netlify/netlify-ts-cli/commit/3de24a001bf9031306f7aa3ae7b4be482fd76c1e))
+* **cli:** use NETLIFY_BUILD_BASE for local mirror cache path (EX-2098) ([b5f75e3](https://github.com/netlify/netlify-ts-cli/commit/b5f75e36397219b25b22a5524d363648bc834b84))
+
 ## [1.1.0](https://github.com/netlify/netlify-ts-cli/compare/v1.0.4...v1.1.0) (2026-04-28)
 
 
