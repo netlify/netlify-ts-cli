@@ -17,10 +17,14 @@ const MANIFEST_URL = `https://raw.githubusercontent.com/netlify/${TEMPLATE_REPO_
 type StarterEntry = { id: string; framework?: string }
 
 // Local mirror produced by the SWAR build cache via `utils.cache.save("./swar-templates")`.
-// The `cwd` segment is added by `@netlify/cache-utils` to namespace the cache by base
-// (cwd/home/root). See netlify/build packages/cache-utils/src/path.ts.
+// Netlify Build's plugin runtime is configured with `cacheDir = /opt/build/cache` (passed in by
+// buildbot as `b.paths.Cache`), so the entry lands at `<NETLIFY_BUILD_BASE>/cache/cwd/<name>/`.
+// The `cwd` segment is added by `@netlify/cache-utils` to namespace by base. Buildbot exports
+// `NETLIFY_BUILD_BASE` to the agent-runner subprocess, which is inherited by ts-cli via execa.
 function localMirrorDir(): string | undefined {
-  const dir = join(process.cwd(), '.netlify', 'cache', 'cwd', TEMPLATE_REPO_NAME)
+  const buildBase = process.env.NETLIFY_BUILD_BASE
+  if (!buildBase) return undefined
+  const dir = join(buildBase, 'cache', 'cwd', TEMPLATE_REPO_NAME)
   return existsSync(dir) ? dir : undefined
 }
 
@@ -64,7 +68,9 @@ interface ResolvedSource {
 // Remove the local mirror written by the SWAR build cache, regardless of whether ts-cli ended up
 // using it. Otherwise it gets re-saved into the user's site cache on every build going forward.
 async function cleanupLocalMirror(): Promise<void> {
-  const cacheCwd = join(process.cwd(), '.netlify', 'cache', 'cwd')
+  const buildBase = process.env.NETLIFY_BUILD_BASE
+  if (!buildBase) return
+  const cacheCwd = join(buildBase, 'cache', 'cwd')
   await rm(join(cacheCwd, TEMPLATE_REPO_NAME), { recursive: true, force: true })
   await rm(join(cacheCwd, `${TEMPLATE_REPO_NAME}.netlify.cache.json`), { force: true })
 }
