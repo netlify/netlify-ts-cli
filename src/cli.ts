@@ -61,6 +61,14 @@ interface ResolvedSource {
   cleanup: () => Promise<void>
 }
 
+// Remove the local mirror written by the SWAR build cache, regardless of whether ts-cli ended up
+// using it. Otherwise it gets re-saved into the user's site cache on every build going forward.
+async function cleanupLocalMirror(): Promise<void> {
+  const cacheCwd = join(process.cwd(), '.netlify', 'cache', 'cwd')
+  await rm(join(cacheCwd, TEMPLATE_REPO_NAME), { recursive: true, force: true })
+  await rm(join(cacheCwd, `${TEMPLATE_REPO_NAME}.netlify.cache.json`), { force: true })
+}
+
 // Resolve where to copy template files from. First try a sparse clone from GitHub. If that fails
 // and a local mirror is available, fall back to it and re-resolve `frameworkId` from the mirror's
 // manifest (the GitHub manifest we already loaded may reference a starter or framework that the
@@ -81,7 +89,10 @@ async function resolveSourceDir(
     return {
       srcDir: tmpDir,
       frameworkId: githubFrameworkId,
-      cleanup: () => rm(tmpDir, { recursive: true, force: true }),
+      cleanup: async () => {
+        await rm(tmpDir, { recursive: true, force: true })
+        await cleanupLocalMirror()
+      },
     }
   } catch {
     await rm(tmpDir, { recursive: true, force: true })
@@ -92,7 +103,7 @@ async function resolveSourceDir(
     const localManifest = await readLocalManifest<{ starters: StarterEntry[] }>(mirror)
     if (!localManifest) bailGitHubUnreachable('clone template repo')
     const frameworkId = localManifest.starters.find((s) => s.id === starterId)?.framework
-    return { srcDir: mirror, frameworkId, cleanup: async () => {} }
+    return { srcDir: mirror, frameworkId, cleanup: cleanupLocalMirror }
   }
 }
 
