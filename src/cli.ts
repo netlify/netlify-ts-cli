@@ -14,9 +14,10 @@ const GITHUB_REPO = 'https://github.com/netlify/swar-templates.git'
 const MANIFEST_URL =
   'https://raw.githubusercontent.com/netlify/swar-templates/main/manifest.json'
 
-// Local mirror produced by the SWAR build cache and preserved through agent-runner cleanDirectory.
+// Local mirror produced by the SWAR build cache via `utils.cache.save("./swar-templates")` and
+// restored into the agent-runner build's working dir at `.netlify/cache/swar-templates/`.
 function localMirrorDir(): string | undefined {
-  const dir = join(process.cwd(), 'swar-templates')
+  const dir = join(process.cwd(), '.netlify', 'cache', 'swar-templates')
   return existsSync(dir) ? dir : undefined
 }
 
