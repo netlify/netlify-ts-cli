@@ -10,25 +10,35 @@ import validatePackageName from 'validate-npm-package-name'
 
 import type { CliOptions } from './types.js'
 
-const GITHUB_REPO = 'https://github.com/netlify/swar-templates.git'
-const MANIFEST_URL =
-  'https://raw.githubusercontent.com/netlify/swar-templates/main/manifest.json'
+const TEMPLATE_REPO_NAME = 'swar-templates'
+const GITHUB_REPO = `https://github.com/netlify/${TEMPLATE_REPO_NAME}.git`
+const MANIFEST_URL = `https://raw.githubusercontent.com/netlify/${TEMPLATE_REPO_NAME}/main/manifest.json`
+
+type StarterEntry = { id: string; framework?: string }
 
 // Local mirror produced by the SWAR build cache via `utils.cache.save("./swar-templates")` and
 // restored into the agent-runner build's working dir at `.netlify/cache/swar-templates/`.
 function localMirrorDir(): string | undefined {
-  const dir = join(process.cwd(), '.netlify', 'cache', 'swar-templates')
+  const dir = join(process.cwd(), '.netlify', 'cache', TEMPLATE_REPO_NAME)
   return existsSync(dir) ? dir : undefined
 }
 
 function bailGitHubUnreachable(operation: string): never {
   console.error(
     chalk.red(
-      `Could not ${operation} from GitHub and no local swar-templates mirror is available. ` +
-        `GitHub may be experiencing an outage — please retry in a few minutes.`,
+      `Could not ${operation} from GitHub and no local ${TEMPLATE_REPO_NAME} mirror is available. ` +
+        `GitHub may be experiencing an outage. Please try again in a few minutes.`,
     ),
   )
   process.exit(1)
+}
+
+async function readLocalManifest<T>(dir: string): Promise<T | undefined> {
+  try {
+    return JSON.parse(await readFile(join(dir, 'manifest.json'), 'utf-8')) as T
+  } catch {
+    return undefined
+  }
 }
 
 async function loadManifest<T>(): Promise<T> {
@@ -37,13 +47,51 @@ async function loadManifest<T>(): Promise<T> {
   } catch {
     const dir = localMirrorDir()
     if (!dir) bailGitHubUnreachable('fetch manifest')
-    try {
-      const parsed = JSON.parse(await readFile(join(dir, 'manifest.json'), 'utf-8')) as T
-      console.warn(chalk.yellow('⚠ Could not reach GitHub, using local swar-templates copy'))
-      return parsed
-    } catch {
-      bailGitHubUnreachable('fetch manifest')
+    const parsed = await readLocalManifest<T>(dir)
+    if (!parsed) bailGitHubUnreachable('fetch manifest')
+    console.warn(chalk.yellow(`⚠ Could not reach GitHub, using local ${TEMPLATE_REPO_NAME} copy`))
+    return parsed
+  }
+}
+
+interface ResolvedSource {
+  srcDir: string
+  frameworkId: string | undefined
+  cleanup: () => Promise<void>
+}
+
+// Resolve where to copy template files from. First try a sparse clone from GitHub. If that fails
+// and a local mirror is available, fall back to it and re-resolve `frameworkId` from the mirror's
+// manifest (the GitHub manifest we already loaded may reference a starter or framework that the
+// SWAR build cache hasn't picked up yet).
+async function resolveSourceDir(
+  starterId: string,
+  githubFrameworkId: string | undefined,
+): Promise<ResolvedSource> {
+  const tmpDir = await mkdtemp(join(tmpdir(), 'netlify-cta-'))
+  try {
+    console.log(chalk.gray('⟳ Fetching template...'))
+    const sparsePaths = [
+      `starters/${starterId}`,
+      ...(githubFrameworkId ? [`frameworks/${githubFrameworkId}`] : []),
+    ]
+    execSync(`git clone --depth=1 --sparse ${GITHUB_REPO} ${tmpDir}`, { stdio: 'pipe' })
+    execSync(`git -C ${tmpDir} sparse-checkout set ${sparsePaths.join(' ')}`, { stdio: 'pipe' })
+    return {
+      srcDir: tmpDir,
+      frameworkId: githubFrameworkId,
+      cleanup: () => rm(tmpDir, { recursive: true, force: true }),
     }
+  } catch {
+    await rm(tmpDir, { recursive: true, force: true })
+    const mirror = localMirrorDir()
+    if (!mirror) bailGitHubUnreachable('clone template repo')
+    console.warn(chalk.yellow(`⚠ Could not clone template repo, using local ${TEMPLATE_REPO_NAME} copy`))
+
+    const localManifest = await readLocalManifest<{ starters: StarterEntry[] }>(mirror)
+    if (!localManifest) bailGitHubUnreachable('clone template repo')
+    const frameworkId = localManifest.starters.find((s) => s.id === starterId)?.framework
+    return { srcDir: mirror, frameworkId, cleanup: async () => {} }
   }
 }
 
@@ -149,45 +197,10 @@ export function cli() {
     console.log(chalk.gray(`Using starter: ${starterId}`))
 
     // Fetch manifest to resolve frameworkId for this starter
-    type StarterEntry = { id: string; framework?: string }
     const manifest = await loadManifest<{ starters: StarterEntry[] }>()
-    let frameworkId = manifest.starters.find((s) => s.id === starterId)?.framework
+    const githubFrameworkId = manifest.starters.find((s) => s.id === starterId)?.framework
 
-    // Resolve the source directory: sparse clone from GitHub, or fall back to the local mirror.
-    let srcDir: string
-    let cloneTmpDir: string | undefined
-    try {
-      cloneTmpDir = await mkdtemp(join(tmpdir(), 'netlify-cta-'))
-      console.log(chalk.gray('⟳ Fetching template...'))
-      const sparsePaths = [`starters/${starterId}`, ...(frameworkId ? [`frameworks/${frameworkId}`] : [])]
-      execSync(`git clone --depth=1 --sparse ${GITHUB_REPO} ${cloneTmpDir}`, { stdio: 'pipe' })
-      execSync(
-        `git -C ${cloneTmpDir} sparse-checkout set ${sparsePaths.join(' ')}`,
-        { stdio: 'pipe' },
-      )
-      srcDir = cloneTmpDir
-    } catch {
-      if (cloneTmpDir) {
-        await rm(cloneTmpDir, { recursive: true, force: true })
-        cloneTmpDir = undefined
-      }
-      const dir = localMirrorDir()
-      if (!dir) bailGitHubUnreachable('clone template repo')
-      console.warn(chalk.yellow('⚠ Could not clone template repo, using local swar-templates copy'))
-      srcDir = dir
-
-      // Re-read manifest from the local mirror; the GitHub manifest we just used may reference
-      // a starter or framework that swar-build-cache hasn't picked up yet.
-      try {
-        const localManifest = JSON.parse(
-          await readFile(join(dir, 'manifest.json'), 'utf-8'),
-        ) as { starters: StarterEntry[] }
-        frameworkId = localManifest.starters.find((s) => s.id === starterId)?.framework
-      } catch {
-        bailGitHubUnreachable('clone template repo')
-      }
-    }
-
+    const { srcDir, frameworkId, cleanup } = await resolveSourceDir(starterId, githubFrameworkId)
     try {
       const starterPath = join(srcDir, 'starters', starterId)
       if (!existsSync(starterPath)) {
@@ -226,9 +239,7 @@ export function cli() {
 
       console.log(chalk.green(`✓ Template copied`))
     } finally {
-      if (cloneTmpDir) {
-        await rm(cloneTmpDir, { recursive: true, force: true })
-      }
+      await cleanup()
     }
 
     // Initialize git repository
