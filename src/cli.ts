@@ -16,8 +16,8 @@ const MANIFEST_URL = `https://raw.githubusercontent.com/netlify/${TEMPLATE_REPO_
 
 type StarterEntry = { id: string; framework?: string }
 
-// Local mirror produced by the SWAR build cache via `utils.cache.save("./swar-templates")`. The
-// `cwd` segment is added by `@netlify/cache-utils` to namespace the cache by base
+// Local mirror produced by the SWAR build cache via `utils.cache.save("./swar-templates")`.
+// The `cwd` segment is added by `@netlify/cache-utils` to namespace the cache by base
 // (cwd/home/root). See netlify/build packages/cache-utils/src/path.ts.
 function localMirrorDir(): string | undefined {
   const dir = join(process.cwd(), '.netlify', 'cache', 'cwd', TEMPLATE_REPO_NAME)
