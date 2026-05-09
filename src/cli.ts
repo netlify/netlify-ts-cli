@@ -456,7 +456,7 @@ export function cli() {
     if (options.install === false) {
       info(chalk.cyan(`  ${pm} install`))
     }
-    info(chalk.cyan('  pnpm dev'))
+    info(chalk.cyan(`  ${pm} run dev`))
   })
 
   program.parse()
