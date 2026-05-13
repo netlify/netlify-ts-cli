@@ -1,6 +1,6 @@
 import { resolve, basename } from 'node:path'
 import { existsSync } from 'node:fs'
-import { cp, rm, mkdtemp, readFile, writeFile, symlink } from 'node:fs/promises'
+import { cp, rm, mkdtemp, readFile, writeFile, symlink, readdir } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { execSync } from 'node:child_process'
@@ -8,13 +8,36 @@ import { Command } from 'commander'
 import chalk from 'chalk'
 import validatePackageName from 'validate-npm-package-name'
 
-import type { CliOptions } from './types.js'
+import type { CliOptions, ProjectSummary } from './types.js'
 
 const TEMPLATE_REPO_NAME = 'swar-templates'
 const GITHUB_REPO = `https://github.com/netlify/${TEMPLATE_REPO_NAME}.git`
 const MANIFEST_URL = `https://raw.githubusercontent.com/netlify/${TEMPLATE_REPO_NAME}/main/manifest.json`
 
 type StarterEntry = { id: string; framework?: string }
+
+// In `--json` mode, all human-readable progress messages go to stderr so stdout
+// stays a single parseable JSON document for callers like Claude Code.
+let jsonMode = false
+
+function info(msg: string): void {
+  if (jsonMode) process.stderr.write(msg + '\n')
+  else process.stdout.write(msg + '\n')
+}
+
+function warn(msg: string): void {
+  if (jsonMode) process.stderr.write(msg + '\n')
+  else process.stderr.write(msg + '\n')
+}
+
+function bail(code: string, message: string): never {
+  if (jsonMode) {
+    process.stdout.write(JSON.stringify({ error: message, code }) + '\n')
+  } else {
+    process.stderr.write(chalk.red(message) + '\n')
+  }
+  process.exit(1)
+}
 
 // Local mirror produced by the SWAR build cache via `utils.cache.save("./swar-templates")`.
 // Netlify Build's plugin runtime is configured with `cacheDir = /opt/build/cache` (passed in by
@@ -29,13 +52,11 @@ function localMirrorDir(): string | undefined {
 }
 
 function bailGitHubUnreachable(operation: string): never {
-  console.error(
-    chalk.red(
-      `Could not ${operation} from GitHub and no local ${TEMPLATE_REPO_NAME} mirror is available. ` +
-        `GitHub may be experiencing an outage. Please try again in a few minutes.`,
-    ),
+  bail(
+    'github_unreachable',
+    `Could not ${operation} from GitHub and no local ${TEMPLATE_REPO_NAME} mirror is available. ` +
+      `GitHub may be experiencing an outage. Please try again in a few minutes.`,
   )
-  process.exit(1)
 }
 
 async function readLocalManifest<T>(dir: string): Promise<T | undefined> {
@@ -54,7 +75,7 @@ async function loadManifest<T>(): Promise<T> {
     if (!dir) bailGitHubUnreachable('fetch manifest')
     const parsed = await readLocalManifest<T>(dir)
     if (!parsed) bailGitHubUnreachable('fetch manifest')
-    console.warn(chalk.yellow(`⚠ Could not reach GitHub, using local ${TEMPLATE_REPO_NAME} copy`))
+    warn(chalk.yellow(`⚠ Could not reach GitHub, using local ${TEMPLATE_REPO_NAME} copy`))
     return parsed
   }
 }
@@ -85,7 +106,7 @@ async function resolveSourceDir(
 ): Promise<ResolvedSource> {
   const tmpDir = await mkdtemp(join(tmpdir(), 'netlify-cta-'))
   try {
-    console.log(chalk.gray('⟳ Fetching template...'))
+    info(chalk.gray('⟳ Fetching template...'))
     const sparsePaths = [
       `starters/${starterId}`,
       ...(githubFrameworkId ? [`frameworks/${githubFrameworkId}`] : []),
@@ -104,7 +125,7 @@ async function resolveSourceDir(
     await rm(tmpDir, { recursive: true, force: true })
     const mirror = localMirrorDir()
     if (!mirror) bailGitHubUnreachable('clone template repo')
-    console.warn(chalk.yellow(`⚠ Could not clone template repo, using local ${TEMPLATE_REPO_NAME} copy`))
+    warn(chalk.yellow(`⚠ Could not clone template repo, using local ${TEMPLATE_REPO_NAME} copy`))
 
     const localManifest = await readLocalManifest<{ starters: StarterEntry[] }>(mirror)
     if (!localManifest) bailGitHubUnreachable('clone template repo')
@@ -149,6 +170,99 @@ function getPackageManagerFromUserAgent(): string | undefined {
   return separatorPos !== -1 ? pmSpec.substring(0, separatorPos) : pmSpec
 }
 
+const SUMMARY_IGNORE_DIRS = new Set([
+  'node_modules',
+  '.git',
+  'dist',
+  'build',
+  '.next',
+  '.output',
+  '.turbo',
+  '.cache',
+  '.vercel',
+  '.netlify',
+  'coverage',
+])
+
+async function walkProjectFiles(root: string): Promise<string[]> {
+  const out: string[] = []
+  async function walk(dir: string, rel: string): Promise<void> {
+    let entries
+    try {
+      entries = await readdir(dir, { withFileTypes: true })
+    } catch {
+      return
+    }
+    for (const entry of entries) {
+      if (SUMMARY_IGNORE_DIRS.has(entry.name)) continue
+      const relPath = rel ? `${rel}/${entry.name}` : entry.name
+      if (entry.isDirectory()) {
+        await walk(join(dir, entry.name), relPath)
+      } else if (entry.isFile() || entry.isSymbolicLink()) {
+        out.push(relPath)
+      }
+    }
+  }
+  await walk(root, '')
+  out.sort()
+  return out
+}
+
+async function findAgentInstructions(root: string): Promise<string[]> {
+  const found: string[] = []
+  for (const candidate of ['CLAUDE.md', 'AGENTS.md', '.claude/CLAUDE.md', '.claude/AGENTS.md']) {
+    if (existsSync(join(root, candidate))) found.push(candidate)
+  }
+  for (const sub of ['agents', 'skills', 'commands']) {
+    const dir = join(root, '.claude', sub)
+    if (!existsSync(dir)) continue
+    try {
+      const entries = await readdir(dir, { withFileTypes: true })
+      for (const e of entries) {
+        if (e.isFile()) found.push(`.claude/${sub}/${e.name}`)
+      }
+    } catch {
+      // ignore
+    }
+  }
+  return found
+}
+
+async function readPackageJsonSummary(
+  root: string,
+): Promise<ProjectSummary['packageJson']> {
+  const path = join(root, 'package.json')
+  if (!existsSync(path)) return undefined
+  try {
+    const pkg = JSON.parse(await readFile(path, 'utf-8'))
+    return {
+      path: 'package.json',
+      name: typeof pkg.name === 'string' ? pkg.name : undefined,
+      scripts: (pkg.scripts ?? {}) as Record<string, string>,
+      dependencies: Object.keys(pkg.dependencies ?? {}),
+      devDependencies: Object.keys(pkg.devDependencies ?? {}),
+    }
+  } catch {
+    return undefined
+  }
+}
+
+function buildNextSteps(
+  targetDir: string,
+  pm: string,
+  installRan: boolean,
+  scripts: Record<string, string> | undefined,
+): ProjectSummary['nextSteps'] {
+  const commands: { label: string; command: string }[] = []
+  if (!installRan) commands.push({ label: 'install', command: `${pm} install` })
+  for (const name of ['dev', 'build', 'start', 'test']) {
+    if (scripts && scripts[name]) {
+      commands.push({ label: name, command: `${pm} run ${name}` })
+    }
+  }
+  return { cd: targetDir, commands }
+}
+
 export function cli() {
   const program = new Command()
 
@@ -171,12 +285,19 @@ export function cli() {
       '--target-dir <path>',
       'the target directory for the application root',
     )
+    .option(
+      '--json',
+      'emit a machine-readable JSON summary of the created project on stdout (logs go to stderr)',
+      false,
+    )
 
   program.action(async (projectName: string | undefined, options: CliOptions) => {
+    jsonMode = options.json === true
+
     // Handle --list-addons-json
     if (options.listAddonsJson) {
       const manifest = await loadManifest<{ starters: unknown }>()
-      console.log(JSON.stringify(manifest.starters, null, 2))
+      process.stdout.write(JSON.stringify(manifest.starters, null, 2) + '\n')
       process.exit(0)
     }
 
@@ -197,8 +318,7 @@ export function cli() {
 
     const { valid, error } = validateProjectName(resolvedProjectName)
     if (!valid) {
-      console.error(chalk.red(error))
-      process.exit(1)
+      bail('invalid_project_name', error)
     }
 
     // Delete index.html if it exists in the target directory
@@ -207,12 +327,12 @@ export function cli() {
       await rm(indexHtmlPath)
     }
 
-    console.log(
+    info(
       chalk.bold.cyan(
         `Creating a new Netlify TanStack Start app in directory ${chalk.white(targetDir)}...`,
       ),
     )
-    console.log(chalk.gray(`Using starter: ${starterId}`))
+    info(chalk.gray(`Using starter: ${starterId}`))
 
     // Fetch manifest to resolve frameworkId for this starter
     const manifest = await loadManifest<{ starters: StarterEntry[] }>()
@@ -222,12 +342,10 @@ export function cli() {
     try {
       const starterPath = join(srcDir, 'starters', starterId)
       if (!existsSync(starterPath)) {
-        console.error(
-          chalk.red(
-            `Starter "${starterId}" not found in the template repository. Run --list-addons-json to see available starters.`,
-          ),
+        bail(
+          'starter_not_found',
+          `Starter "${starterId}" not found in the template repository. Run --list-addons-json to see available starters.`,
         )
-        process.exit(1)
       }
 
       // Copy starter files to target directory
@@ -237,11 +355,11 @@ export function cli() {
       if (frameworkId) {
         const frameworkPath = join(srcDir, 'frameworks', frameworkId)
         if (existsSync(frameworkPath)) {
-          console.log(chalk.gray(`⟳ Applying framework overlay (${frameworkId})...`))
+          info(chalk.gray(`⟳ Applying framework overlay (${frameworkId})...`))
           await cp(frameworkPath, targetDir, { recursive: true })
-          console.log(chalk.green(`✓ Framework overlay applied (${frameworkId})`))
+          info(chalk.green(`✓ Framework overlay applied (${frameworkId})`))
         } else {
-          console.log(chalk.yellow(`⚠ Framework overlay "${frameworkId}" not found in repo, skipping`))
+          info(chalk.yellow(`⚠ Framework overlay "${frameworkId}" not found in repo, skipping`))
         }
       }
 
@@ -255,41 +373,50 @@ export function cli() {
         }
       }
 
-      console.log(chalk.green(`✓ Template copied`))
+      info(chalk.green(`✓ Template copied`))
     } finally {
       await cleanup()
     }
 
     // Initialize git repository
+    let gitInitialized = false
     if (options.git !== false) {
       try {
         execSync('git init', { cwd: targetDir, stdio: 'pipe' })
-        console.log(chalk.green('✓ Initialized git repository'))
+        gitInitialized = true
+        info(chalk.green('✓ Initialized git repository'))
       } catch {
-        console.warn(chalk.yellow('⚠ Could not initialize git repository'))
+        warn(chalk.yellow('⚠ Could not initialize git repository'))
       }
     }
 
     // Install dependencies
+    const pm =
+      options.packageManager ??
+      getPackageManagerFromUserAgent() ??
+      'pnpm'
+    let installRan = false
+    let installCommand: string | undefined
     if (options.install !== false) {
-      const pm =
-        options.packageManager ??
-        getPackageManagerFromUserAgent() ??
-        'pnpm'
-      console.log(chalk.gray(`⟳ Installing dependencies with ${pm}...`))
+      info(chalk.gray(`⟳ Installing dependencies with ${pm}...`))
       try {
         let cmd = `${pm} install`
         if (pm === 'npm') {
           cmd += ' --no-audit --no-fund --prefer-offline'
-          console.log(chalk.gray(`  ${cmd}`))
+          info(chalk.gray(`  ${cmd}`))
         }
-        execSync(cmd, { cwd: targetDir, stdio: 'inherit' })
-        console.log(chalk.green('✓ Dependencies installed'))
+        installCommand = cmd
+        // In JSON mode, redirect install's stdout to our stderr so the JSON
+        // summary stays the only thing on stdout.
+        execSync(cmd, {
+          cwd: targetDir,
+          stdio: jsonMode ? ['ignore', 2, 'inherit'] : 'inherit',
+        })
+        installRan = true
+        info(chalk.green('✓ Dependencies installed'))
       } catch {
-        console.error(
-          chalk.red(
-            `Failed to install dependencies. Run \`${pm} install\` manually.`,
-          ),
+        process.stderr.write(
+          chalk.red(`Failed to install dependencies. Run \`${pm} install\` manually.`) + '\n',
         )
       }
     }
@@ -300,21 +427,36 @@ export function cli() {
       const agentsDir = join(targetDir, '.agents')
       if (!existsSync(agentsDir)) {
         await symlink('.claude', agentsDir, 'dir')
-        console.log(chalk.green('✓ Linked .agents → .claude'))
+        info(chalk.green('✓ Linked .agents → .claude'))
       }
     }
 
-    console.log(chalk.bold.green('\nDone! Your project is ready.'))
-    console.log(chalk.white('\nNext steps:'))
-    console.log(chalk.cyan(`  cd ${basename(targetDir)}`))
-    if (options.install === false) {
-      const pm =
-        options.packageManager ??
-        getPackageManagerFromUserAgent() ??
-        'pnpm'
-      console.log(chalk.cyan(`  ${pm} install`))
+    if (jsonMode) {
+      const pkgSummary = await readPackageJsonSummary(targetDir)
+      const summary: ProjectSummary = {
+        schemaVersion: 1,
+        targetDir,
+        projectName: pkgSummary?.name ?? resolvedProjectName,
+        starter: { id: starterId, framework: frameworkId },
+        git: { initialized: gitInitialized },
+        packageManager: pm,
+        install: { ran: installRan, command: installCommand },
+        packageJson: pkgSummary,
+        agentInstructions: await findAgentInstructions(targetDir),
+        files: await walkProjectFiles(targetDir),
+        nextSteps: buildNextSteps(targetDir, pm, installRan, pkgSummary?.scripts),
+      }
+      process.stdout.write(JSON.stringify(summary, null, 2) + '\n')
+      return
     }
-    console.log(chalk.cyan('  pnpm dev'))
+
+    info(chalk.bold.green('\nDone! Your project is ready.'))
+    info(chalk.white('\nNext steps:'))
+    info(chalk.cyan(`  cd ${basename(targetDir)}`))
+    if (options.install === false) {
+      info(chalk.cyan(`  ${pm} install`))
+    }
+    info(chalk.cyan(`  ${pm} run dev`))
   })
 
   program.parse()
