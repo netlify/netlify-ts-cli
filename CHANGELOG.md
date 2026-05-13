@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.2.0](https://github.com/netlify/netlify-ts-cli/compare/v1.1.1...v1.2.0) (2026-05-13)
+
+
+### Features
+
+* **cli:** add --json flag for machine-readable project summary ([f771db0](https://github.com/netlify/netlify-ts-cli/commit/f771db078345ce1fa186e3bf08d38317aa2be331))
+* **cli:** add --json flag for machine-readable project summary ([795f1cf](https://github.com/netlify/netlify-ts-cli/commit/795f1cf130b368e91bdc05294cc0a29fa9813e52))
+
 ## [1.1.1](https://github.com/netlify/netlify-ts-cli/compare/v1.1.0...v1.1.1) (2026-04-28)
 
 
